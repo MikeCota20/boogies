@@ -1,0 +1,4 @@
+{% for exam in exams %}
+    <h2><a href="{% url 'exam_detail' exam.pk %}">{{ exam.title }}</a></h2>
+    <p>Profesor: {{ exam.teacher.username }}</p>
+{% endfor %}

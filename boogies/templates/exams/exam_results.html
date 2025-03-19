@@ -1,0 +1,38 @@
+<h1>Resultados del Examen: {{ exam.title }}</h1>
+<p>Profesor: {{ exam.teacher.username }}</p>
+
+{% for question, answers in results.items %}
+    <h2>Pregunta: {{ question.text }}</h2>
+    
+    {% if question.question_type == "multiple_choice" %}
+        <p><strong>Opciones:</strong></p>
+        <ul>
+            {% for choice in question.choices.all %}
+                <li {% if choice.is_correct %} style="color: green; font-weight: bold;" {% endif %}>
+                    {{ choice.text }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h3>Respuestas de los estudiantes:</h3>
+    <ul>
+        {% for answer in answers %}
+            <li>
+                <strong>{{ answer.student.username }}:</strong>
+                {% if question.question_type == "open" %}
+                    {{ answer.text }}
+                {% else %}
+                    {{ answer.selected_choice.text }}
+                    {% if answer.selected_choice.is_correct %}
+                        ✅ Correcta
+                    {% else %}
+                        ❌ Incorrecta
+                    {% endif %}
+                {% endif %}
+            </li>
+        {% empty %}
+            <p>No hay respuestas aún.</p>
+        {% endfor %}
+    </ul>
+{% endfor %}

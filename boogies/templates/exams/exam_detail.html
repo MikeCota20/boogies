@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ exam.title }}</h1>
+<p><strong>Profesor:</strong> {{ exam.teacher.username }}</p>
+<p><strong>Descripción:</strong> {{ exam.description }}</p>
+<p><strong>Fecha de creación:</strong> {{ exam.created_at }}</p>
+
+{% if user != exam.teacher %}
+    <form method="post" action="{% url 'submit_answer' exam.pk %}">
+        {% csrf_token %}
+        {% for question in exam.questions.all %}
+            <div class="question">
+                <h3>{{ forloop.counter }}. {{ question.text }}</h3>
+                
+                {% if question.question_type == "open" %}
+                    <textarea name="question_{{ question.id }}" rows="3" cols="50" required></textarea>
+                
+                {% elif question.question_type == "multiple_choice" %}
+                    <ul>
+                        {% for choice in question.choices.all %}
+                            <li>
+                                <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}" required>
+                                {{ choice.text }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit">Enviar Respuestas</button>
+    </form>
+{% else %}
+    <p><strong>Este es tu examen. Los estudiantes pueden responder.</strong></p>
+    <a href="{% url 'exam_results' exam.pk %}">Ver Resultados</a>
+{% endif %}
+
+{% endblock %}
