@@ -2,7 +2,8 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 
 class CustomUser(AbstractUser):
-    is_teacher = models.BooleanField(default=False)  # Agregar el campo is_teacher
+    is_teacher = models.BooleanField(default=False)  # Indica si el usuario es profesor
+    is_student = models.BooleanField(default=True)  # Indica si el usuario es estudiante
 
     groups = models.ManyToManyField(
         Group,
@@ -15,3 +16,6 @@ class CustomUser(AbstractUser):
         related_name="customuser_set",
         blank=True
     )
+
+    def __str__(self):
+        return self.username

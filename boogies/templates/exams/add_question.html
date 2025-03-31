@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Agregar Pregunta</h2>
+<form method="post">
+    {% csrf_token %}
+    
+    <label for="question_text">Pregunta:</label>
+    <textarea name="question_text" required></textarea>
+
+    <label for="question_type">Tipo de pregunta:</label>
+    <select name="question_type">
+        <option value="open">Pregunta Abierta</option>
+        <option value="multiple_choice">Opción Múltiple</option>
+    </select>
+
+    <div id="multiple_choice_section" style="display: none;">
+        <h3>Opciones:</h3>
+        <input type="text" name="choices" required>
+        <input type="text" name="choices">
+        <input type="text" name="choices">
+        <input type="text" name="choices">
+
+        <h3>Selecciona la respuesta correcta:</h3>
+        <select name="correct_choice">
+            <option value="0">Primera opción</option>
+            <option value="1">Segunda opción</option>
+            <option value="2">Tercera opción</option>
+            <option value="3">Cuarta opción</option>
+        </select>
+    </div>
+
+    <button type="submit">Guardar Pregunta</button>
+</form>
+
+<script>
+document.querySelector('select[name="question_type"]').addEventListener('change', function() {
+    document.getElementById('multiple_choice_section').style.display = 
+        this.value === 'multiple_choice' ? 'block' : 'none';
+});
+</script>
+
+{% endblock %}
+
+<!-- <h2>Agregar Pregunta para {{ exam.title }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Agregar Pregunta</button>
+</form>
+
+<a href="{% url 'exam_list' %}">Terminar</a>
+ -->

@@ -5,7 +5,9 @@ User = get_user_model()
 
 class Exam(models.Model):
     title = models.CharField(max_length=255)
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'is_teacher': True})
+    teacher = models.ForeignKey(
+        User, on_delete=models.CASCADE, limit_choices_to={'is_teacher': True}, related_name="exams"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -34,9 +36,11 @@ class Choice(models.Model):
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
-    student = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'is_student': True})
-    text = models.TextField(blank=True, null=True)  # Respuesta para preguntas abiertas
-    selected_choice = models.ForeignKey(Choice, on_delete=models.CASCADE, blank=True, null=True, related_name='selected_answers')  # Respuesta para opción múltiple
+    student = models.ForeignKey(
+        User, on_delete=models.CASCADE, limit_choices_to={'is_student': True}, related_name="answers"
+    )
+    text = models.TextField(blank=True, null=True)
+    selected_choice = models.ForeignKey(Choice, on_delete=models.CASCADE, blank=True, null=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
