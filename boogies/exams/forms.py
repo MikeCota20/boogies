@@ -4,12 +4,13 @@ from .models import Exam, Question, Choice
 class ExamForm(forms.ModelForm):
     class Meta:
         model = Exam
-        fields = ['title', 'teacher']
+        exclude = ['teacher']  # Excluye el campo teacher
 
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ['exam', 'text', 'question_type']
+        fields = ['text', 'question_type']  # No necesitas que el campo exam sea manejado en el formulario
+
 
 class ChoiceForm(forms.ModelForm):
     class Meta:

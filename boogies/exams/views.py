@@ -29,15 +29,20 @@ def add_exam(request):
     if request.method == 'POST':
         form = ExamForm(request.POST)
         if form.is_valid():
+            # Crear el examen
             exam = form.save(commit=False)
-            exam.teacher = request.user
+            exam.teacher = request.user  # Asignar el teacher al examen
             exam.save()
-            return redirect('add_question', exam_id=exam.id)  # Redirige a agregar preguntas
+
+            messages.success(request, "Examen creado exitosamente.")
+            return redirect('add_question_view', exam_id=exam.id)  # Redirigir a agregar preguntas
 
     else:
         form = ExamForm()
 
     return render(request, 'exams/add_exam.html', {'form': form})
+
+
 
 
 # 🔹 AGREGAR PREGUNTA A UN EXAMEN (Solo profesores)
@@ -118,33 +123,32 @@ def exam_results(request, pk):
 
 
 def add_question_view(request, exam_id):
-    exam = get_object_or_404(Exam, id=exam_id)  # Obtener el examen
+    exam = get_object_or_404(Exam, id=exam_id)
 
     if request.method == "POST":
-        form = QuestionForm(request.POST)
+        question_text = request.POST.get("question_text")
+        question_type = request.POST.get("question_type", "open")
 
-        if form.is_valid():
-            question = form.save(commit=False)
-            question.exam = exam  # Asigna la pregunta al examen actual
-            question.save()
+        # Crear la pregunta
+        question = Question.objects.create(
+            exam=exam,
+            text=question_text,
+            question_type=question_type
+        )
 
-            # Si es una pregunta de opción múltiple, guardar opciones
-            if question.question_type == 'multiple_choice':
-                choices = request.POST.getlist('choices')  # Lista de opciones
-                correct_choice_index = int(request.POST.get('correct_choice', -1))
+        # Si es una pregunta de opción múltiple, agregar opciones
+        if question_type == "multiple_choice":
+            choices = request.POST.getlist("choices")  # Obtiene todas las opciones
+            correct_choice_index = int(request.POST.get("correct_choice", -1))
 
-                for index, choice_text in enumerate(choices):
-                    if choice_text.strip():  # Evitar guardar opciones vacías
-                        Choice.objects.create(
-                            question=question,
-                            choice_text=choice_text,
-                            is_correct=(index == correct_choice_index)
-                        )
+            for index, choice_text in enumerate(choices):
+                Choice.objects.create(
+                    question=question,
+                    text=choice_text,  # Aquí corregimos el nombre del campo
+                    is_correct=(index == correct_choice_index)
+                )
 
-            messages.success(request, "Pregunta agregada correctamente.")
-            return redirect('exam_detail', exam_id=exam.id)  # Redirigir a la vista del examen
+        return redirect("exam_detail", pk=exam.id)
 
-    else:
-        form = QuestionForm()
 
-    return render(request, 'exams/add_question.html', {'form': form, 'exam': exam})
+    return render(request, "exams/add_question.html", {"exam": exam})

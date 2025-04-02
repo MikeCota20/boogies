@@ -1,11 +1,14 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
 <h2>Crear Examen</h2>
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Crear Examen</button>
+    
+    <label for="title">Título del Examen:</label>
+    <input type="text" name="title" required>
+
+    <button type="submit">Guardar Examen</button>
 </form>
 
 {% endblock %}
