@@ -1,4 +1,22 @@
-{% for exam in exams %}
-    <h2><a href="{% url 'exam_detail' exam.pk %}">{{ exam.title }}</a></h2>
-    <p>Profesor: {{ exam.teacher.username }}</p>
-{% endfor %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Lista de Exámenes</h2>
+
+    {% for exam in exams %}
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title">
+                    <a href="{% url 'exam_detail' exam.pk %}" class="text-decoration-none text-primary">
+                        {{ exam.title }}
+                    </a>
+                </h4>
+                <p class="card-text"><strong>Profesor:</strong> {{ exam.teacher.username }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-muted">No hay exámenes registrados aún.</p>
+    {% endfor %}
+</div>
+{% endblock %}

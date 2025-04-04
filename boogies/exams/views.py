@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Exam, Question, Answer, Choice
-from .forms import ExamForm, QuestionForm, ChoiceForm  # Asegúrate de tener estos formularios
+from .forms import ExamForm, QuestionForm, ChoiceForm, AnswerForm  # Asegúrate de tener estos formularios
 
 
 # 🔹 LISTAR EXÁMENES
@@ -18,6 +18,19 @@ class ExamDetailView(DetailView):
     model = Exam
     template_name = 'exams/exam_detail.html'
     context_object_name = 'exam'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        exam = context['exam']  # Obtenemos el examen
+
+        # Obtener las respuestas de cada pregunta
+        questions_with_answers = []
+        for question in exam.questions.all():
+            answers = Answer.objects.filter(question=question)  # Filtrar respuestas por pregunta
+            questions_with_answers.append({'question': question, 'answers': answers})
+
+        context['questions_with_answers'] = questions_with_answers  # Añadir las preguntas con respuestas al contexto
+        return context
 
 
 # 🔹 AGREGAR EXAMEN (Solo profesores)
@@ -92,20 +105,33 @@ def add_choice(request, question_id):
 # 🔹 ENVIAR RESPUESTA (Solo estudiantes)
 @login_required
 def submit_answer(request, pk):
-    question = get_object_or_404(Question, pk=pk)
+    exam = get_object_or_404(Exam, pk=pk)
+    student = request.user
 
-    if request.method == 'POST':
-        if question.question_type == 'open':
-            text = request.POST.get('answer_text')
-            Answer.objects.create(question=question, student=request.user, text=text)
-        elif question.question_type == 'multiple_choice':
-            choice_id = request.POST.get('answer_choice')
-            choice = get_object_or_404(Choice, id=choice_id)
-            Answer.objects.create(question=question, student=request.user, selected_choice=choice)
+    if request.method == "POST":
+        for question in exam.questions.all():
+            answer_key = f"answer_{question.id}"
+            if answer_key in request.POST:
+                if question.question_type == "open":
+                    answer_text = request.POST[answer_key]
+                    Answer.objects.create(
+                        question=question,
+                        student=student,
+                        text=answer_text
+                    )
+                elif question.question_type == "multiple_choice":
+                    choice_id = request.POST[answer_key]
+                    choice = get_object_or_404(Choice, id=choice_id)
+                    Answer.objects.create(
+                        question=question,
+                        student=student,
+                        selected_choice=choice
+                    )
 
-        return redirect('exam_detail', pk=question.exam.pk)
+        # Redirigir de nuevo a la vista de detalles del examen después de enviar las respuestas
+        return redirect('exam_detail', pk=exam.pk)
 
-    return render(request, 'exams/submit_answer.html', {'question': question})
+    return render(request, "exams/exam_detail.html", {"exam": exam})
 
 
 # 🔹 VER RESULTADOS (Solo el profesor del examen)
@@ -126,29 +152,67 @@ def add_question_view(request, exam_id):
     exam = get_object_or_404(Exam, id=exam_id)
 
     if request.method == "POST":
-        question_text = request.POST.get("question_text")
-        question_type = request.POST.get("question_type", "open")
+        # Obtener todas las preguntas enviadas
+        question_texts = request.POST.getlist("question_text")
+        question_types = request.POST.getlist("question_type")
 
-        # Crear la pregunta
-        question = Question.objects.create(
-            exam=exam,
-            text=question_text,
-            question_type=question_type
-        )
+        for i, question_text in enumerate(question_texts):
+            question_type = question_types[i]
 
-        # Si es una pregunta de opción múltiple, agregar opciones
-        if question_type == "multiple_choice":
-            choices = request.POST.getlist("choices")  # Obtiene todas las opciones
-            correct_choice_index = int(request.POST.get("correct_choice", -1))
+            # Crear la pregunta
+            question = Question.objects.create(
+                exam=exam,
+                text=question_text,
+                question_type=question_type
+            )
 
-            for index, choice_text in enumerate(choices):
-                Choice.objects.create(
-                    question=question,
-                    text=choice_text,  # Aquí corregimos el nombre del campo
-                    is_correct=(index == correct_choice_index)
-                )
+            # Procesar opciones si es de tipo múltiple
+            if question_type == "multiple_choice":
+                # Cada grupo de opciones tiene un name como choices_0, choices_1, etc.
+                choices_key = f"choices_{i}"
+                correct_key = f"correct_choice_{i}"
+                
+                choices = request.POST.getlist(choices_key)
+                correct_choice_index = int(request.POST.get(correct_key, -1))
+
+                for index, choice_text in enumerate(choices):
+                    Choice.objects.create(
+                        question=question,
+                        text=choice_text,
+                        is_correct=(index == correct_choice_index)
+                    )
 
         return redirect("exam_detail", pk=exam.id)
 
-
     return render(request, "exams/add_question.html", {"exam": exam})
+
+
+@login_required
+def submit_answer(request, pk):
+    exam = get_object_or_404(Exam, pk=pk)
+    student = request.user
+
+    if request.method == "POST":
+        for question in exam.questions.all():
+            answer_key = f"answer_{question.id}"
+            if answer_key in request.POST:
+                if question.question_type == "open":
+                    answer_text = request.POST[answer_key]
+                    Answer.objects.create(
+                        question=question,
+                        student=student,
+                        text=answer_text
+                    )
+                elif question.question_type == "multiple_choice":
+                    choice_id = request.POST[answer_key]
+                    choice = get_object_or_404(Choice, id=choice_id)
+                    Answer.objects.create(
+                        question=question,
+                        student=student,
+                        selected_choice=choice
+                    )
+
+        return redirect("exam_results", pk=exam.id)  # Redirigir a la página de resultados
+
+    return render(request, "exam_detail.html", {"exam": exam})
+

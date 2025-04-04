@@ -24,4 +24,6 @@ urlpatterns = [
     path('exam/<int:exam_id>/add-question/', add_question, name='add_question'),
     path('add/', add_exam, name='create_exam'),
     path('<int:exam_id>/add_question/', add_question_view, name='add_question_view'),
+    path("<int:pk>/submit/", submit_answer, name="submit_answer"),
+
 ]
