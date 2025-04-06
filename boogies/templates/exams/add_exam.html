@@ -1,14 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Crear Examen</h2>
-<form method="post">
-    {% csrf_token %}
-    
-    <label for="title">Título del Examen:</label>
-    <input type="text" name="title" required>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Crear Examen</h2>
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="title" class="form-label">Título del Examen:</label>
+            <input type="text" name="title" id="title" class="form-control" required>
+            <div class="invalid-feedback">
+                Por favor ingrese un título para el examen.
+            </div>
+        </div>
 
-    <button type="submit">Guardar Examen</button>
-</form>
+        <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary">Guardar Examen</button>
+        </div>
+    </form>
+</div>
 
 {% endblock %}

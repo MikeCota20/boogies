@@ -41,6 +41,7 @@ class Answer(models.Model):
     )
     text = models.TextField(blank=True, null=True)
     selected_choice = models.ForeignKey(Choice, on_delete=models.CASCADE, blank=True, null=True)
+    is_correct = models.BooleanField(null=True, blank=True)  # ✅ Para preguntas abiertas
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

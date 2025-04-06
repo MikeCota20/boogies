@@ -1,39 +1,66 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ exam.title }}</h1>
-<p><strong>Profesor:</strong> {{ exam.teacher.username }}</p>
-<p><strong>Fecha de creación:</strong> {{ exam.created_at }}</p>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">{{ exam.title }}</h1>
+    
+    <p><strong>Profesor:</strong> {{ exam.teacher.username }}</p>
+    <p><strong>Fecha de creación:</strong> {{ exam.created_at }}</p>
 
-{% if user != exam.teacher %}
-    <form method="post" action="{% url 'submit_answer' exam.pk %}">
-        {% csrf_token %}
-        <h2>Responde las preguntas del examen:</h2>
+    {% if user != exam.teacher %}
+        <!-- Formulario de respuestas para estudiantes -->
+        <form method="post" action="{% url 'submit_answer' exam.pk %}">
+            {% csrf_token %}
+            <h2 class="mt-4 mb-3">Responde las preguntas del examen:</h2>
+            
+            {% for question in exam.questions.all %}
+                <div class="question mb-4 p-3 border rounded shadow-sm">
+                    <h3>{{ forloop.counter }}. {{ question.text }}</h3>
+                    
+                    {% if question.question_type == "open" %}
+                        <div class="mb-3">
+                            <label for="answer_{{ question.id }}" class="form-label">Respuesta:</label>
+                            <textarea name="answer_{{ question.id }}" id="answer_{{ question.id }}" class="form-control" rows="3" required></textarea>
+                        </div>
+                    {% elif question.question_type == "multiple_choice" %}
+                        <div class="mb-3">
+                            <h5>Opciones:</h5>
+                            <ul>
+                                {% for choice in question.choices.all %}
+                                    <li>
+                                        <input type="radio" name="answer_{{ question.id }}" value="{{ choice.id }}" required>
+                                        <label>{{ choice.text }}</label>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn btn-primary">Enviar Respuestas</button>
+        </form>
+    {% else %}
+        <!-- Panel de edición para profesores -->
+        <div class="alert alert-info">
+            <strong>Este es tu examen. Los estudiantes pueden responder.</strong>
+        </div>
+        
+        <a href="{% url 'exam_results' exam.pk %}" class="btn btn-secondary mb-4">Ver Resultados</a>
+
+        <h3 class="mb-3">Administrar Preguntas</h3>
+
+        <!-- Agregar o modificar preguntas -->
+        <a href="{% url 'add_question_view' exam.pk %}" class="btn btn-success mb-3">Agregar Pregunta</a>
+
         {% for question in exam.questions.all %}
-            <div class="question">
+            <div class="question mb-4 p-3 border rounded shadow-sm">
                 <h3>{{ forloop.counter }}. {{ question.text }}</h3>
                 
-                {% if question.question_type == "open" %}
-                    <textarea name="answer_{{ question.id }}" rows="3" cols="50" required></textarea>
-                
-                {% elif question.question_type == "multiple_choice" %}
-                    <ul>
-                        {% for choice in question.choices.all %}
-                            <li>
-                                <input type="radio" name="answer_{{ question.id }}" value="{{ choice.id }}" required>
-                                {{ choice.text }}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+                <a href="{% url 'edit_question' question.pk %}" class="btn btn-warning btn-sm">Editar</a>
+                <a href="{% url 'delete_question' question.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta pregunta?')">Eliminar</a>
             </div>
         {% endfor %}
-        
-        <button type="submit">Enviar Respuestas</button>
-    </form>
-{% else %}
-    <p><strong>Este es tu examen. Los estudiantes pueden responder.</strong></p>
-    <a href="{% url 'exam_results' exam.pk %}">Ver Resultados</a>
-{% endif %}
-
+    {% endif %}
+</div>
 {% endblock %}

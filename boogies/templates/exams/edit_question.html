@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Editar Pregunta</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="text" class="form-label">Texto de la pregunta:</label>
+            <textarea name="text" id="text" class="form-control" rows="3" required>{{ question.text }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="question_type" class="form-label">Tipo de pregunta:</label>
+            <select name="question_type" id="question_type" class="form-select" required>
+                <option value="open" {% if question.question_type == "open" %}selected{% endif %}>Respuesta Abierta</option>
+                <option value="multiple_choice" {% if question.question_type == "multiple_choice" %}selected{% endif %}>Opción Múltiple</option>
+            </select>
+        </div>
+
+        {% if question.question_type == "multiple_choice" %}
+            <h4 class="mt-4">Opciones:</h4>
+            {% for choice in question.choices.all %}
+                <div class="mb-2">
+                    <input type="text" name="choice_{{ forloop.counter0 }}" class="form-control mb-1" value="{{ choice.text }}" required>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="correct_choice" value="{{ forloop.counter0 }}" {% if choice.is_correct %}checked{% endif %}>
+                        <label class="form-check-label">Respuesta Correcta</label>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
+        <a href="{% url 'exam_detail' question.exam.id %}" class="btn btn-secondary mt-3">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

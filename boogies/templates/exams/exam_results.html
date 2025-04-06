@@ -6,35 +6,56 @@
     <h1 class="mb-4 text-center">Resultados del Examen: <span class="text-primary">{{ exam.title }}</span></h1>
     <p class="text-muted text-center">Profesor: <strong>{{ exam.teacher.username }}</strong></p>
 
-    {% for question, answers in results.items %}
-        <div class="card mb-4 shadow-sm">
-            <div class="card-body">
-                <h4 class="card-title">Pregunta:</h4>
-                <p class="fs-5">{{ question.text }}</p>
+    <form method="get" class="mb-4">
+        <label for="student_id" class="form-label">Filtrar por estudiante:</label>
+        <select name="student_id" id="student_id" class="form-select" onchange="this.form.submit()">
+            <option value="">-- Selecciona un estudiante --</option>
+            {% for student in students %}
+                <option value="{{ student.id }}" {% if selected_student and student.id == selected_student.id %}selected{% endif %}>
+                    {{ student.username }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
 
-                {% if question.question_type == "multiple_choice" %}
-                    <p><strong>Opciones:</strong></p>
-                    <ul class="list-group mb-3">
-                        {% for choice in question.choices.all %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center 
-                                {% if choice.is_correct %} list-group-item-success fw-bold {% endif %}">
-                                {{ choice.text }}
-                                {% if choice.is_correct %}
-                                    <span class="badge bg-success">Correcta</span>
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+    {% if selected_student %}
+        <h4>Estudiante seleccionado: <strong>{{ selected_student.username }}</strong></h4>
+        <p>Calificación: <strong>{{ score }}/{{ total }}</strong></p>
+    {% endif %}
 
-                <h5>Respuestas de los estudiantes:</h5>
-                {% if answers %}
+    {% if results %}
+        {% for question, answers in results.items %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title">Pregunta:</h4>
+                    <p class="fs-5">{{ question.text }}</p>
+
+                    {% if question.question_type == "multiple_choice" %}
+                        <p><strong>Opciones:</strong></p>
+                        <ul class="list-group mb-3">
+                            {% for choice in question.choices.all %}
+                                <li class="list-group-item {% if choice.is_correct %}list-group-item-success fw-bold{% endif %}">
+                                    {{ choice.text }}
+                                    {% if choice.is_correct %}
+                                        <span class="badge bg-success">Correcta</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <h5>Respuesta:</h5>
                     <ul class="list-group">
                         {% for answer in answers %}
                             <li class="list-group-item">
-                                <strong>{{ answer.student.username }}:</strong>
                                 {% if question.question_type == "open" %}
-                                    {{ answer.text }}
+                                    <p>{{ answer.text }}</p>
+
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input calificar-check" type="checkbox" data-answer-id="{{ answer.id }}" {% if answer.is_correct %}checked{% endif %}>
+                                        <label class="form-check-label" for="correct-{{ answer.id }}">¿Respuesta correcta?</label>
+                                    </div>
+                                    <span class="status-msg" id="status-{{ answer.id }}"></span>
                                 {% else %}
                                     {{ answer.selected_choice.text }}
                                     {% if answer.selected_choice.is_correct %}
@@ -46,11 +67,37 @@
                             </li>
                         {% endfor %}
                     </ul>
-                {% else %}
-                    <p class="text-muted fst-italic">No hay respuestas aún.</p>
-                {% endif %}
+                </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    {% endif %}
 </div>
-{% endblock content %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.calificar-check').change(function () {
+            const answerId = $(this).data('answer-id');
+            const isChecked = $(this).is(':checked');
+            const statusSpan = $('#status-' + answerId);
+
+            $.ajax({
+                url: '/exams/grade-answer/' + answerId + '/',
+                type: 'POST',
+                data: {
+                    is_correct: isChecked,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    statusSpan.text("✅ Guardado");
+                    setTimeout(() => statusSpan.text(""), 1500);
+                },
+                error: function (xhr) {
+                    statusSpan.text("❌ Error");
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

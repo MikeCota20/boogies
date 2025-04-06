@@ -1,83 +1,113 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Agregar Preguntas</h2>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Agregar Preguntas</h2>
 
-<form method="post">
-    {% csrf_token %}
-    <div id="questions-container">
-        <div class="question-form">
-            <h3>Pregunta 1</h3>
-            <label for="question_text">Pregunta:</label>
-            <textarea name="question_text" required></textarea>
+    <form method="post" action="{% url 'add_question' exam.id %}">
+        {% csrf_token %}
+        <div id="questions-container">
+            <div class="question-form mb-4 p-3 border rounded shadow-sm">
+                <h3>Pregunta 1</h3>
+                <div class="mb-3">
+                    <label for="question_text_0" class="form-label">Pregunta:</label>
+                    <textarea name="question_text_0" class="form-control" rows="3" required></textarea>
+                </div>
 
-            <label for="question_type">Tipo de pregunta:</label>
-            <select name="question_type" class="question-type" data-question-index="0">
-                <option value="open">Pregunta Abierta</option>
-                <option value="multiple_choice">Opción Múltiple</option>
-            </select>
+                <div class="mb-3">
+                    <label for="question_type_0" class="form-label">Tipo de pregunta:</label>
+                    <select name="question_type_0" class="form-select question-type" data-question-index="0">
+                        <option value="open">Pregunta Abierta</option>
+                        <option value="multiple_choice">Opción Múltiple</option>
+                    </select>
+                </div>
 
-            <div class="multiple_choice_section" style="display: none;">
-                <h4>Opciones:</h4>
-                <input type="text" name="choices_0" placeholder="Opción 1">
-                <input type="text" name="choices_0" placeholder="Opción 2">
-                <input type="text" name="choices_0" placeholder="Opción 3">
-                <input type="text" name="choices_0" placeholder="Opción 4">
+                <div class="multiple_choice_section" style="display: none;" data-question-index="0">
+                    <h4>Opciones:</h4>
+                    <div class="mb-3">
+                        <input type="text" name="choices_0_0" class="form-control mb-2" placeholder="Opción 1">
+                        <input type="text" name="choices_0_1" class="form-control mb-2" placeholder="Opción 2">
+                        <input type="text" name="choices_0_2" class="form-control mb-2" placeholder="Opción 3">
+                        <input type="text" name="choices_0_3" class="form-control mb-2" placeholder="Opción 4">
+                    </div>
 
-                <h4>Selecciona la respuesta correcta:</h4>
-                <select name="correct_choice_0">
-                    <option value="0">Primera opción</option>
-                    <option value="1">Segunda opción</option>
-                    <option value="2">Tercera opción</option>
-                    <option value="3">Cuarta opción</option>
-                </select>
+                    <h4>Selecciona la respuesta correcta:</h4>
+                    <select name="correct_choice_0" class="form-select">
+                        <option value="0">Primera opción</option>
+                        <option value="1">Segunda opción</option>
+                        <option value="2">Tercera opción</option>
+                        <option value="3">Cuarta opción</option>
+                    </select>
+                </div>
             </div>
         </div>
-    </div>
 
-    <button type="button" id="add-question-btn">Agregar otra pregunta</button>
-    <button type="submit">Guardar Preguntas</button>
-</form>
+        <div class="d-flex justify-content-between">
+            <button type="button" id="add-question-btn" class="btn btn-secondary">Agregar otra pregunta</button>
+            <button type="submit" class="btn btn-primary">Guardar Preguntas</button>
+        </div>
+    </form>
+</div>
 
 <script>
-    // Función para mostrar u ocultar las opciones de múltiple elección
+    // Función para alternar entre las preguntas abiertas y de opción múltiple
+    function toggleMultipleChoice(select) {
+        var questionIndex = select.getAttribute('data-question-index');
+        var section = document.querySelector('.multiple_choice_section[data-question-index="' + questionIndex + '"]');
+        var inputs = section.querySelectorAll('input, select');
+        
+        if (select.value === 'multiple_choice') {
+            section.style.display = 'block';
+            inputs.forEach(function(input) {
+                input.required = true;  // Hacer obligatorio cuando se muestre
+            });
+        } else {
+            section.style.display = 'none';
+            inputs.forEach(function(input) {
+                input.required = false;  // Eliminar la obligación cuando no se muestre
+            });
+        }
+    }
+
     document.querySelectorAll('.question-type').forEach(function(select) {
         select.addEventListener('change', function() {
-            var questionIndex = this.getAttribute('data-question-index');
-            var section = document.querySelector('.multiple_choice_section[data-question-index="' + questionIndex + '"]');
-            section.style.display = (this.value === 'multiple_choice') ? 'block' : 'none';
+            toggleMultipleChoice(this);
         });
     });
 
-    // Función para agregar dinámicamente preguntas adicionales
-    document.getElementById('add-question-btn').addEventListener('click', function() {
+    document.getElementById('add-question-btn').addEventListener('click', function () {
         var questionContainer = document.getElementById('questions-container');
         var questionIndex = questionContainer.children.length;
 
-        // Crear nueva pregunta
         var questionForm = document.createElement('div');
-        questionForm.classList.add('question-form');
+        questionForm.classList.add('question-form', 'mb-4', 'p-3', 'border', 'rounded', 'shadow-sm');
 
         questionForm.innerHTML = `
             <h3>Pregunta ${questionIndex + 1}</h3>
-            <label for="question_text">Pregunta:</label>
-            <textarea name="question_text" required></textarea>
+            <div class="mb-3">
+                <label for="question_text_${questionIndex}" class="form-label">Pregunta:</label>
+                <textarea name="question_text_${questionIndex}" class="form-control" rows="3" required></textarea>
+            </div>
 
-            <label for="question_type">Tipo de pregunta:</label>
-            <select name="question_type" class="question-type" data-question-index="${questionIndex}">
-                <option value="open">Pregunta Abierta</option>
-                <option value="multiple_choice">Opción Múltiple</option>
-            </select>
+            <div class="mb-3">
+                <label for="question_type_${questionIndex}" class="form-label">Tipo de pregunta:</label>
+                <select name="question_type_${questionIndex}" class="form-select question-type" data-question-index="${questionIndex}">
+                    <option value="open">Pregunta Abierta</option>
+                    <option value="multiple_choice">Opción Múltiple</option>
+                </select>
+            </div>
 
             <div class="multiple_choice_section" style="display: none;" data-question-index="${questionIndex}">
                 <h4>Opciones:</h4>
-                <input type="text" name="choices_${questionIndex}" placeholder="Opción 1">
-                <input type="text" name="choices_${questionIndex}" placeholder="Opción 2">
-                <input type="text" name="choices_${questionIndex}" placeholder="Opción 3">
-                <input type="text" name="choices_${questionIndex}" placeholder="Opción 4">
+                <div class="mb-3">
+                    <input type="text" name="choices_${questionIndex}_0" class="form-control mb-2" placeholder="Opción 1">
+                    <input type="text" name="choices_${questionIndex}_1" class="form-control mb-2" placeholder="Opción 2">
+                    <input type="text" name="choices_${questionIndex}_2" class="form-control mb-2" placeholder="Opción 3">
+                    <input type="text" name="choices_${questionIndex}_3" class="form-control mb-2" placeholder="Opción 4">
+                </div>
 
                 <h4>Selecciona la respuesta correcta:</h4>
-                <select name="correct_choice_${questionIndex}">
+                <select name="correct_choice_${questionIndex}" class="form-select">
                     <option value="0">Primera opción</option>
                     <option value="1">Segunda opción</option>
                     <option value="2">Tercera opción</option>
@@ -88,13 +118,12 @@
 
         questionContainer.appendChild(questionForm);
 
-        // Agregar evento para mostrar las opciones de múltiple elección
+        // Activar toggle para nueva pregunta
         var newSelect = questionForm.querySelector('.question-type');
-        newSelect.addEventListener('change', function() {
-            var questionIndex = this.getAttribute('data-question-index');
-            var section = questionForm.querySelector('.multiple_choice_section');
-            section.style.display = (this.value === 'multiple_choice') ? 'block' : 'none';
+        newSelect.addEventListener('change', function () {
+            toggleMultipleChoice(this);
         });
     });
 </script>
+
 {% endblock %}
