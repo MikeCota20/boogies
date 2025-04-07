@@ -1,30 +1,407 @@
-.container {
-    width: 40%;
-    margin: auto;
+
+/*login*/
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fc;
+    margin: 0;
+    padding: 0;
+}
+
+h2 {
     text-align: center;
+    margin-top: 50px;
+    color: #333;
 }
 
 form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    max-width: 400px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-input {
-    padding: 8px;
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    border-color: #4e73df;
+    outline: none;
 }
 
 button {
+    width: 100%;
     padding: 10px;
-    background-color: #28a745;
+    background-color: #4e73df;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
+    font-size: 16px;
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #2e59d9;
 }
+
+a {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #4e73df;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+p {
+    text-align: center;
+    color: red;
+    font-size: 14px;
+}
+
+
+/*register*/
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fc;
+    margin: 0;
+    padding: 0;
+}
+
+h2 {
+    text-align: center;
+    margin-top: 50px;
+    color: #333;
+}
+
+form {
+    max-width: 400px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+input[type="text"], input[type="password"], input[type="email"], input[type="tel"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, input[type="tel"]:focus {
+    border-color: #4e73df;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4e73df;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #2e59d9;
+}
+
+a {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #4e73df;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+p {
+    text-align: center;
+    color: red;
+    font-size: 14px;
+}
+
+
+/*Footer*/
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+}
+
+footer p {
+    margin: 0;
+}
+
+
+/*Exam_list*/
+
+/* Reducir la altura del navbar */
+.navbar {
+    padding: 5px 0; /* Reducido aún más el espacio */
+    height: 90px; /* Aseguramos una altura baja para la barra */
+}
+
+/* Reducir el tamaño de las fuentes dentro del navbar */
+.navbar-brand, .navbar-nav .nav-link {
+    font-size: 0.9rem; /* Fuente un poco más pequeña */
+}
+
+/* Hacer más compacto el navbar en dispositivos móviles */
+.navbar-toggler {
+    padding: 0.25rem 0.5rem; /* Reducir el padding del botón de menú */
+}
+
+/* Reducir el tamaño de los íconos del navbar */
+.navbar-toggler-icon {
+    width: 1.2rem; /* Reducir el tamaño del ícono de la hamburguesa */
+    height: 1.2rem;
+}
+
+/* Estilos generales para las tarjetas */
+.card {
+    border-radius: 8px; /* Bordes redondeados */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición para el hover */
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Eleva ligeramente la tarjeta al pasar el cursor */
+    box-shadow: 0 4px 15px rgba(252, 22, 22, 0.1); /* Sombra al hacer hover */
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title a {
+    font-size: 1.2rem; /* Tamaño de fuente más grande para el título */
+    font-weight: 600; /* Título más destacado */
+}
+
+.card-title a:hover {
+    text-decoration: underline; /* Subraya el título al pasar el cursor */
+}
+
+.text-muted {
+    font-style: italic; /* Estilo itálico para el mensaje de no hay exámenes */
+}
+
+/* Estilo de los botones o enlaces */
+a.text-decoration-none {
+    text-decoration: none; /* Evita subrayar los enlaces */
+}
+
+a.text-decoration-none:hover {
+    color: #0056b3; /* Cambia el color del enlace al hacer hover */
+}
+
+/* Espaciado entre tarjetas */
+.container {
+    padding-bottom: 50px; /* Un poco de espacio adicional al final */
+}
+
+h2 {
+    font-size: 2rem; /* Tamaño de fuente más grande para el título */
+    font-weight: bold;
+    color: #000000; /* Color de título oscuro */
+}
+
+
+/*RESULTADOS*/
+/* Estilo global */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    padding: 20px;
+}
+
+/* Títulos */
+h1 {
+    font-size: 32px;
+    color: #007bff;  /* Azul brillante */
+    font-weight: bold;
+}
+
+h4 {
+    font-size: 24px;
+    color: #333;
+}
+
+h5 {
+    font-size: 20px;
+    color: #555;
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+/* Formulario de filtro */
+.form-label {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.form-select {
+    width: 100%;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+/* Estilo de las tarjetas de preguntas */
+.card {
+    border-radius: 10px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Opciones de respuesta (multiple_choice) */
+.list-group-item {
+    font-size: 16px;
+    padding: 12px;
+}
+
+.list-group-item-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.list-group-item-success .badge {
+    background-color: #28a745;
+}
+
+.list-group-item-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.list-group-item-danger .badge {
+    background-color: #dc3545;
+}
+
+/* Respuestas abiertas */
+.form-check-input {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+.status-msg {
+    font-size: 14px;
+    color: #28a745;
+    margin-left: 10px;
+}
+
+.status-msg.error {
+    color: #dc3545;
+}
+
+.text-success {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.text-danger {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Estilo de la selección de estudiante */
+h4 {
+    margin-top: 20px;
+}
+
+h4 strong {
+    color: #007bff;
+}
+
+p {
+    font-size: 18px;
+}
+
+/* Estilo del script de Ajax (estatus) */
+#status {
+    font-size: 14px;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    h4, h5 {
+        font-size: 20px;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    .form-select {
+        font-size: 14px;
+    }
+
+    .list-group-item {
+        font-size: 14px;
+    }
+}
+
+
+

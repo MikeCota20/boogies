@@ -39,6 +39,9 @@
                         <option value="3">Cuarta opción</option>
                     </select>
                 </div>
+
+                <!-- Botón para eliminar la pregunta -->
+                <button type="button" class="btn btn-danger btn-sm remove-question-btn">Eliminar Pregunta</button>
             </div>
         </div>
 
@@ -75,6 +78,7 @@
         });
     });
 
+    // Función para eliminar una pregunta
     document.getElementById('add-question-btn').addEventListener('click', function () {
         var questionContainer = document.getElementById('questions-container');
         var questionIndex = questionContainer.children.length;
@@ -114,6 +118,9 @@
                     <option value="3">Cuarta opción</option>
                 </select>
             </div>
+
+            <!-- Botón para eliminar la pregunta -->
+            <button type="button" class="btn btn-danger btn-sm remove-question-btn">Eliminar Pregunta</button>
         `;
 
         questionContainer.appendChild(questionForm);
@@ -122,6 +129,11 @@
         var newSelect = questionForm.querySelector('.question-type');
         newSelect.addEventListener('change', function () {
             toggleMultipleChoice(this);
+        });
+
+        // Eliminar pregunta
+        questionForm.querySelector('.remove-question-btn').addEventListener('click', function () {
+            questionForm.remove();
         });
     });
 </script>
